@@ -21,25 +21,38 @@ function App() {
   }, [tick, start, play]);
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      {/* <button onClick={() => play()}>SOUND TEST</button> */}
-      {/* <button onClick={() => stop()}>SOUND TEST</button> */}
-      <button onClick={() => setStart(true)}>START</button>
-      <button
-        onClick={() => {
-          setStart(false);
-          stop();
+    <div>
+      <div>
+        <button onClick={() => setStart(true)}>START</button>
+        <button
+          onClick={() => {
+            setStart(false);
+            stop();
+          }}
+        >
+          STOP
+        </button>
+        <input
+          onChange={(e) => {
+            setTick(Number(e.target.value) * 60);
+          }}
+        />
+        Mins
+      </div>
+      <div
+        style={{
+          height: "100vh",
+          fontSize: "calc(25vw + 16px)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          color: tick < 0 ? "#bd2c00" : "#36970d",
+          fontWeight: "bold",
+          fontFamily: "monospace",
         }}
       >
-        STOP
-      </button>
-      <input
-        onChange={(e) => {
-          setTick(Number(e.target.value) * 60);
-        }}
-      />
-      Mins
-      <Timer tick={tick} />
+        <Timer tick={tick} />
+      </div>
     </div>
   );
 }
