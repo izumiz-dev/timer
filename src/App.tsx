@@ -3,6 +3,7 @@ import { Timer } from "./Timer";
 import useSound from "use-sound";
 import Sound from "./sound.mp3";
 import html2canvas from "html2canvas";
+import * as workerTimers from "worker-timers";
 
 function App() {
   const $dom = useRef<any>(null);
@@ -13,13 +14,14 @@ function App() {
 
   useEffect(() => {
     if (start) {
-      const id = setInterval(() => {
+      const id = workerTimers.setInterval(() => {
         setTick((t) => t - 1);
       }, 1000);
+
       if (tick === 0) {
         play();
       }
-      return () => clearInterval(id);
+      return () => workerTimers.clearInterval(id);
     }
   }, [tick, start, play]);
 
@@ -69,27 +71,10 @@ function App() {
         />
         Mins
       </div>
-      <div
-        style={{
-          height: "100vh",
-          fontSize: "calc(25vw + 16px)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: tick < 0 ? "#bd2c00" : "#36970d",
-          fontWeight: "bold",
-          fontFamily: "monospace",
-        }}
-        ref={$dom}
-      >
-        <Timer tick={tick} />
+      <div>
+        <Timer tick={tick} dom={$dom} />
       </div>
-      <video
-        style={{ display: "none" }}
-        height="100px"
-        width="400px"
-        ref={$video}
-      />
+      <video style={{ display: "none" }} ref={$video} />
     </div>
   );
 }
