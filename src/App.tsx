@@ -188,7 +188,7 @@ function App() {
             <Timer tick={tick} dom={$dom} />
           </Ripple>
         </OuterTimer>
-        <video style={{ display: "none" }} ref={$video} />
+        {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
       </ThemeProvider>
     </>
   );
