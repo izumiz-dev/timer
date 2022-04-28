@@ -6,11 +6,23 @@ import html2canvas from "html2canvas";
 import * as workerTimers from "worker-timers";
 import styled from "styled-components";
 import Ripple from "react-waves-effect";
+import { detect } from "detect-browser";
+import "./App.css";
+import { Button, ButtonGroup } from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import PictureInPictureAltIcon from "@mui/icons-material/PictureInPictureAlt";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-const Button = styled.button`
-  margin: 0px 2px;
-  padding: 0;
-`;
+const browser = detect();
+const isAvailablePiP =
+  browser?.name === "chrome" &&
+  (browser?.os === "Mac OS" || browser?.os?.includes("Windows"));
+
+console.log(JSON.stringify(browser));
 
 const OuterTimer = styled.div`
   height: 100vh;
@@ -20,11 +32,33 @@ const OuterTimer = styled.div`
   align-items: center;
 `;
 
+const Controllers = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: stretch;
+  flex-direction: column;
+  div {
+    margin: 2px;
+  }
+`;
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#00695c",
+    },
+    secondary: {
+      main: "#e91e63",
+    },
+  },
+});
+
 function App() {
   const $dom = useRef<any>(null);
   const $video = useRef<any>(null);
   const [start, setStart] = useState<boolean>(false);
-  const [tick, setTick] = useState<number>(30 * 60);
+  const [tick, setTick] = useState<number>(0);
   const [play, { stop }] = useSound(Sound);
 
   useEffect(() => {
@@ -54,53 +88,104 @@ function App() {
 
   return (
     <>
-      <div id="controllers">
-        <Button onClick={() => setStart(true)}>START</Button>
-        <Button
-          onClick={() => {
-            setStart(false);
-            stop();
-          }}
-        >
-          STOP
-        </Button>
-        <Button
-          onClick={async () => {
-            try {
-              if ($video.current !== document.pictureInPictureElement) {
-                await $video.current.requestPictureInPicture();
-              } else {
-                await document.exitPictureInPicture();
-              }
-            } catch (error) {
-              console.log("ERROR", error);
-            }
-          }}
-        >
-          PiP (Experimental)
-        </Button>
-        <input
-          onChange={(e) => {
-            setTick(Number(e.target.value) * 60);
-          }}
-        />
-        Mins
-      </div>
-      <OuterTimer>
-        <Ripple
-          endHeight="calc(40vh)"
-          endWidth="calc(40vh)"
-          animationDuration={600}
-          animationEasing="ease-in-out"
-          color="#000000"
-          onClick={() => {
-            setStart(!start);
-          }}
-        >
-          <Timer tick={tick} dom={$dom} />
-        </Ripple>
-      </OuterTimer>
-      <video style={{ display: "none" }} ref={$video} />
+      <ThemeProvider theme={theme}>
+        <Controllers>
+          <ButtonGroup>
+            <Button
+              variant="outlined"
+              onClick={() => setTick(tick + 10 * 60)}
+              startIcon={<AddIcon />}
+            >
+              10 Mins
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setTick(tick + 5 * 60)}
+              startIcon={<AddIcon />}
+            >
+              5 Mins
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setTick(0);
+                setStart(false);
+                stop();
+              }}
+              startIcon={<RestartAltIcon />}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setTick(tick - 5 * 60)}
+              startIcon={<RemoveIcon />}
+            >
+              5 Mins
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setTick(tick - 10 * 60)}
+              startIcon={<RemoveIcon />}
+            >
+              10 Mins
+            </Button>
+          </ButtonGroup>
+          <ButtonGroup size="large">
+            <Button
+              variant="outlined"
+              onClick={() => setStart(true)}
+              startIcon={<PlayArrowIcon />}
+            >
+              Start
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setStart(false);
+                stop();
+              }}
+              startIcon={<PauseIcon />}
+            >
+              Pause
+            </Button>
+            {isAvailablePiP && (
+              <Button
+                variant="outlined"
+                onClick={async () => {
+                  try {
+                    if ($video.current !== document.pictureInPictureElement) {
+                      await $video.current.requestPictureInPicture();
+                    } else {
+                      await document.exitPictureInPicture();
+                    }
+                  } catch (error) {
+                    console.log("ERROR", error);
+                  }
+                }}
+                startIcon={<PictureInPictureAltIcon />}
+              >
+                PiP
+              </Button>
+            )}
+          </ButtonGroup>
+        </Controllers>
+        <OuterTimer>
+          <Ripple
+            endHeight="calc(40vh)"
+            endWidth="calc(40vh)"
+            animationDuration={600}
+            animationEasing="ease-in-out"
+            color="#000000"
+            onClick={() => {
+              setStart(!start);
+            }}
+          >
+            <Timer tick={tick} dom={$dom} />
+          </Ripple>
+        </OuterTimer>
+        <video style={{ display: "none" }} ref={$video} />
+      </ThemeProvider>
     </>
   );
 }

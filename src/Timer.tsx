@@ -23,5 +23,4 @@ const StyledTimer = styled.div`
   color: ${(props: { tick: number }) =>
     props.tick < 0 ? "#bd2c00" : "#36970d"};
   font-weight: bold;
-  font-family: monospace;
 `;
