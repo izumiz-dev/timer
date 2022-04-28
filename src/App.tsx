@@ -46,10 +46,10 @@ const Controllers = styled.div`
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#00695c",
+      main: "#cecece",
     },
     secondary: {
-      main: "#e91e63",
+      main: "#69a7ba",
     },
   },
 });
@@ -92,21 +92,23 @@ function App() {
         <Controllers>
           <ButtonGroup>
             <Button
-              variant="outlined"
-              onClick={() => setTick(tick + 10 * 60)}
-              startIcon={<AddIcon />}
+              variant="contained"
+              color="error"
+              onClick={() => setTick(tick - 10 * 60)}
+              startIcon={<RemoveIcon />}
             >
-              10 Mins
+              10
             </Button>
             <Button
-              variant="outlined"
-              onClick={() => setTick(tick + 5 * 60)}
-              startIcon={<AddIcon />}
+              variant="contained"
+              color="error"
+              onClick={() => setTick(tick - 5 * 60)}
+              startIcon={<RemoveIcon />}
             >
-              5 Mins
+              5
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={() => {
                 setTick(0);
                 setStart(false);
@@ -117,30 +119,32 @@ function App() {
               Reset
             </Button>
             <Button
-              variant="outlined"
-              onClick={() => setTick(tick - 5 * 60)}
-              startIcon={<RemoveIcon />}
+              variant="contained"
+              color="success"
+              onClick={() => setTick(tick + 5 * 60)}
+              startIcon={<AddIcon />}
             >
-              5 Mins
+              5
             </Button>
             <Button
-              variant="outlined"
-              onClick={() => setTick(tick - 10 * 60)}
-              startIcon={<RemoveIcon />}
+              variant="contained"
+              color="success"
+              onClick={() => setTick(tick + 10 * 60)}
+              startIcon={<AddIcon />}
             >
-              10 Mins
+              10
             </Button>
           </ButtonGroup>
-          <ButtonGroup size="large">
+          <ButtonGroup>
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={() => setStart(true)}
               startIcon={<PlayArrowIcon />}
             >
               Start
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={() => {
                 setStart(false);
                 stop();
@@ -151,7 +155,7 @@ function App() {
             </Button>
             {isAvailablePiP && (
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={async () => {
                   try {
                     if ($video.current !== document.pictureInPictureElement) {
