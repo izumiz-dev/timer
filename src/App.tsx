@@ -1,28 +1,25 @@
-import { useEffect, useRef, useState } from "react";
-import { Timer } from "./Timer";
-import useSound from "use-sound";
-import Sound from "./sound.mp3";
-import html2canvas from "html2canvas";
-import * as workerTimers from "worker-timers";
-import styled from "styled-components";
-import Ripple from "react-waves-effect";
-import { detect } from "detect-browser";
 import "./App.css";
-import { Button, ButtonGroup } from "@mui/material";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { Timer } from "./Timer";
+import Sound from "./sound.mp3";
+import AddIcon from "@mui/icons-material/Add";
 import PauseIcon from "@mui/icons-material/Pause";
 import PictureInPictureAltIcon from "@mui/icons-material/PictureInPictureAlt";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import AddIcon from "@mui/icons-material/Add";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RemoveIcon from "@mui/icons-material/Remove";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { Button, ButtonGroup } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { detect } from "detect-browser";
+import html2canvas from "html2canvas";
+import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
+import useSound from "use-sound";
+import * as workerTimers from "worker-timers";
 
 const browser = detect();
 const isAvailablePiP =
   browser?.name === "chrome" &&
   (browser?.os === "Mac OS" || browser?.os?.includes("Windows"));
-
-console.log(JSON.stringify(browser));
 
 const OuterTimer = styled.div`
   height: 100vh;
@@ -175,18 +172,7 @@ function App() {
           </ButtonGroup>
         </Controllers>
         <OuterTimer>
-          <Ripple
-            endHeight="calc(40vh)"
-            endWidth="calc(40vh)"
-            animationDuration={600}
-            animationEasing="ease-in-out"
-            color="#000000"
-            onClick={() => {
-              setStart(!start);
-            }}
-          >
-            <Timer tick={tick} dom={$dom} />
-          </Ripple>
+          <Timer tick={tick} dom={$dom} />
         </OuterTimer>
         {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
       </ThemeProvider>

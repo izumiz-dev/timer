@@ -1,3 +1,17 @@
 html {
   font-family: "Roboto Mono", monospace;
 }
+
+@media (prefers-color-scheme: light) {
+  body {
+    background-color: #eee;
+    color: #111;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #111;
+    color: #eee;
+  }
+}
