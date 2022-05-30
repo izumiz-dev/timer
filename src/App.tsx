@@ -18,7 +18,7 @@ import * as workerTimers from "worker-timers";
 
 const browser = detect();
 const isAvailablePiP =
-  browser?.name === "chrome" &&
+  (browser?.name === "chrome" || browser?.name === "edge-chromium") &&
   (browser?.os === "Mac OS" || browser?.os?.includes("Windows"));
 
 const OuterTimer = styled.div`
