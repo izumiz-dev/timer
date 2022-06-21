@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import screenfull from "screenfull";
 
 export const Clock = ({
   time,
@@ -9,7 +10,7 @@ export const Clock = ({
 }) => {
   return (
     <>
-      <OuterClock>
+      <OuterClock isFullScreen={screenfull.isFullscreen}>
         <StyledClock ref={dom}>{formatterHHMM.format(time)}</StyledClock>
       </OuterClock>
     </>
@@ -21,7 +22,8 @@ const StyledClock = styled.div`
 `;
 
 const OuterClock = styled.div`
-  height: calc(100vh - 220px);
+  ${(props: { isFullScreen: boolean }) =>
+    props.isFullScreen ? `height: 100vh` : `height: calc(100vh - 220px)`};
   font-size: calc(25vw + 16px);
   display: flex;
   justify-content: center;

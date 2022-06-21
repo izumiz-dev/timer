@@ -8,6 +8,7 @@ import useSound from "use-sound";
 import * as workerTimers from "worker-timers";
 import { TimerController } from "./TimerController";
 import { Clock } from "./Clock";
+import screenfull from "screenfull";
 
 const browser = detect();
 const isAvailablePiP =
@@ -71,18 +72,21 @@ function App() {
 
   return (
     <>
-      <TimerController
-        start={start}
-        setStart={setStart}
-        tick={tick}
-        setTick={setTick}
-        stop={stop}
-        isAvailablePiP={isAvailablePiP}
-        video={$video}
-        videoClock={$videoClock}
-        clock={clock}
-        setClock={setClock}
-      />
+      {!screenfull.isFullscreen && (
+        <TimerController
+          start={start}
+          setStart={setStart}
+          tick={tick}
+          setTick={setTick}
+          stop={stop}
+          isAvailablePiP={isAvailablePiP}
+          video={$video}
+          videoClock={$videoClock}
+          clock={clock}
+          setClock={setClock}
+        />
+      )}
+
       {clock ? (
         <div>
           <Clock time={time} dom={$domClock} />

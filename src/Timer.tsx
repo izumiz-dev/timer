@@ -1,3 +1,4 @@
+import screenfull from "screenfull";
 import styled from "styled-components";
 
 export const Timer = ({
@@ -9,7 +10,7 @@ export const Timer = ({
 }) => {
   return (
     <>
-      <OuterTimer>
+      <OuterTimer isFullScreen={screenfull.isFullscreen}>
         <StyledTimer tick={tick} ref={dom}>
           {Math.floor(Math.abs(tick) / 60)
             .toString()
@@ -28,7 +29,8 @@ const StyledTimer = styled.div`
 `;
 
 const OuterTimer = styled.div`
-  height: calc(100vh - 220px);
+  ${(props: { isFullScreen: boolean }) =>
+    props.isFullScreen ? `height: 100vh` : `height: calc(100vh - 220px)`};
   font-size: calc(25vw + 16px);
   display: flex;
   justify-content: center;
