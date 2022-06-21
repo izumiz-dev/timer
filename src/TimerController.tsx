@@ -9,6 +9,7 @@ import {
   ButtonGroup,
   FormControlLabel,
   Switch,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import styled from "styled-components";
@@ -77,39 +78,49 @@ export const TimerController = ({
             </Button>
           </ButtonGroup>
           <ButtonGroup>
-            <Button
-              disabled={!isAvailablePiP}
-              onClick={async () => {
-                try {
-                  if (clock) {
-                    if (
-                      videoClock.current !== document.pictureInPictureElement
-                    ) {
-                      await videoClock.current.requestPictureInPicture();
-                    } else {
-                      await document.exitPictureInPicture();
-                    }
-                  } else {
-                    if (video.current !== document.pictureInPictureElement) {
-                      await video.current.requestPictureInPicture();
-                    } else {
-                      await document.exitPictureInPicture();
-                    }
-                  }
-                } catch (error) {
-                  console.log("ERROR", error);
-                }
-              }}
-              startIcon={<PictureInPictureAltIcon />}
+            <Tooltip
+              placement="top"
+              title="コンパクトなウィンドウとして表示します。"
             >
-              ピクチャーインピクチャー
-            </Button>
+              <Button
+                disabled={!isAvailablePiP}
+                onClick={async () => {
+                  try {
+                    if (clock) {
+                      if (
+                        videoClock.current !== document.pictureInPictureElement
+                      ) {
+                        await videoClock.current.requestPictureInPicture();
+                      } else {
+                        await document.exitPictureInPicture();
+                      }
+                    } else {
+                      if (video.current !== document.pictureInPictureElement) {
+                        await video.current.requestPictureInPicture();
+                      } else {
+                        await document.exitPictureInPicture();
+                      }
+                    }
+                  } catch (error) {
+                    console.log("ERROR", error);
+                  }
+                }}
+                startIcon={<PictureInPictureAltIcon />}
+              >
+                ピクチャーインピクチャー
+              </Button>
+            </Tooltip>
           </ButtonGroup>
-          <FormControlLabel
-            style={{ marginLeft: "4px" }}
-            label="時計モード"
-            control={<Switch onClick={() => setClock(!clock)} />}
-          />
+          <Tooltip
+            placement="top"
+            title="タイマーの代わりに現在時刻が表示されます。"
+          >
+            <FormControlLabel
+              style={{ marginLeft: "4px" }}
+              label="時計モード"
+              control={<Switch onClick={() => setClock(!clock)} />}
+            />
+          </Tooltip>
         </div>
       </div>
       <div>
