@@ -10,21 +10,28 @@ import {
   FormControlLabel,
   FormGroup,
   Switch,
+  Typography,
 } from "@mui/material";
 import styled from "styled-components";
 
 const Controllers = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   align-content: stretch;
   flex-direction: column;
+  border: 1px solid gray;
+  padding: 8px;
+  margin: 10px 16px;
+  border-radius: 8px;
+  width: fit-content;
   div {
     margin: 2px;
   }
 `;
 
 export const TimerController = ({
+  start,
   setStart,
   tick,
   setTick,
@@ -35,6 +42,7 @@ export const TimerController = ({
   clock,
   setClock,
 }: {
+  start: boolean;
   setStart: any;
   tick: any;
   setTick: any;
@@ -47,64 +55,31 @@ export const TimerController = ({
 }): JSX.Element => {
   return (
     <Controllers>
-      <ButtonGroup>
-        <Button
-          color="error"
-          onClick={() => setTick(tick - 10 * 60)}
-          startIcon={<RemoveIcon />}
-        >
-          10分
-        </Button>
-        <Button
-          color="error"
-          onClick={() => setTick(tick - 5 * 60)}
-          startIcon={<RemoveIcon />}
-        >
-          5分
-        </Button>
-        <Button
-          onClick={() => {
-            setTick(0);
-            setStart(false);
-            stop();
-          }}
-          startIcon={<RestartAltIcon />}
-        >
-          リセット
-        </Button>
-        <Button
-          color="success"
-          onClick={() => setTick(tick + 5 * 60)}
-          startIcon={<AddIcon />}
-        >
-          5分
-        </Button>
-        <Button
-          color="success"
-          onClick={() => setTick(tick + 10 * 60)}
-          startIcon={<AddIcon />}
-        >
-          10分
-        </Button>
-      </ButtonGroup>
       <div>
-        <ButtonGroup>
-          <Button onClick={() => setStart(true)} startIcon={<PlayArrowIcon />}>
-            開始
-          </Button>
-          <Button
-            onClick={() => {
-              setStart(false);
-              stop();
-            }}
-            startIcon={<PauseIcon />}
-          >
-            一時停止
-          </Button>
-        </ButtonGroup>
-        {isAvailablePiP && (
+        <Typography>タイマー操作</Typography>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <ButtonGroup disabled={clock}>
+            <Button
+              disabled={start}
+              onClick={() => setStart(true)}
+              startIcon={<PlayArrowIcon />}
+            >
+              開始
+            </Button>
+            <Button
+              disabled={!start}
+              onClick={() => {
+                setStart(false);
+                stop();
+              }}
+              startIcon={<PauseIcon />}
+            >
+              一時停止
+            </Button>
+          </ButtonGroup>
           <ButtonGroup>
             <Button
+              disabled={!isAvailablePiP}
               onClick={async () => {
                 try {
                   if (clock) {
@@ -128,17 +103,75 @@ export const TimerController = ({
               }}
               startIcon={<PictureInPictureAltIcon />}
             >
-              ピクチャーインピクチャ
+              ピクチャーインピクチャー
             </Button>
           </ButtonGroup>
-        )}
+          <FormControlLabel
+            style={{ marginLeft: "4px" }}
+            label="時計モード"
+            control={<Switch onClick={() => setClock(!clock)} />}
+          />
+        </div>
       </div>
-      <FormGroup>
-        <FormControlLabel
-          control={<Switch onClick={() => setClock(!clock)} />}
-          label="時計モード"
-        />
-      </FormGroup>
+      <div>
+        <Typography style={{ margin: "0 2px" }}>タイマー時間設定</Typography>
+        <ButtonGroup disabled={clock}>
+          <Button
+            color="error"
+            onClick={() => setTick(tick - 10 * 60)}
+            startIcon={<RemoveIcon />}
+          >
+            10分
+          </Button>
+          <Button
+            color="error"
+            onClick={() => setTick(tick - 5 * 60)}
+            startIcon={<RemoveIcon />}
+          >
+            5分
+          </Button>
+          <Button
+            color="success"
+            onClick={() => setTick(tick + 5 * 60)}
+            startIcon={<AddIcon />}
+          >
+            5分
+          </Button>
+          <Button
+            color="success"
+            onClick={() => setTick(tick + 10 * 60)}
+            startIcon={<AddIcon />}
+          >
+            10分
+          </Button>
+          <Button
+            onClick={() => {
+              setTick(0);
+              setStart(false);
+              stop();
+            }}
+            startIcon={<RestartAltIcon />}
+          >
+            リセット
+          </Button>
+        </ButtonGroup>
+      </div>
+      <div style={{ width: "100%", margin: "0 4px" }}>
+        <a
+          href="https://www.izumiz.me/blog/pip-countdown-timer"
+          target="_blank"
+        >
+          <Typography variant="caption">Blog Post</Typography>
+        </a>
+        {"  "}
+        <a href="https://github.com/izumiz-dev/negative-timer" target="_blank">
+          <Typography variant="caption">Github Repo</Typography>
+        </a>
+        {"  "}
+        <a href="https://twitter.com/izumiz_dev" target="_blank">
+          <Typography variant="caption">Contact</Typography>
+        </a>
+      </div>
     </Controllers>
   );
 };

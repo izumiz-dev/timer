@@ -21,7 +21,7 @@ const StyledClock = styled.div`
 `;
 
 const OuterClock = styled.div`
-  height: calc(100vh - 130px);
+  height: calc(100vh - 220px);
   font-size: calc(25vw + 16px);
   display: flex;
   justify-content: center;
@@ -32,9 +32,3 @@ const formatterHHMM = Intl.DateTimeFormat("ja-JP", {
   hour: "2-digit",
   minute: "2-digit",
 });
-
-// const formatterDate = Intl.DateTimeFormat("ja-JP", {
-//   year: "numeric",
-//   month: "numeric",
-//   day: "numeric",
-// });

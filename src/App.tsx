@@ -72,6 +72,7 @@ function App() {
   return (
     <>
       <TimerController
+        start={start}
         setStart={setStart}
         tick={tick}
         setTick={setTick}

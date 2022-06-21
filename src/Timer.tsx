@@ -28,7 +28,7 @@ const StyledTimer = styled.div`
 `;
 
 const OuterTimer = styled.div`
-  height: calc(100vh - 130px);
+  height: calc(100vh - 220px);
   font-size: calc(25vw + 16px);
   display: flex;
   justify-content: center;
