@@ -8,7 +8,6 @@ import {
   Button,
   ButtonGroup,
   FormControlLabel,
-  FormGroup,
   Switch,
   Typography,
 } from "@mui/material";
@@ -160,15 +159,24 @@ export const TimerController = ({
         <a
           href="https://www.izumiz.me/blog/pip-countdown-timer"
           target="_blank"
+          rel="noreferrer"
         >
           <Typography variant="caption">Blog Post</Typography>
         </a>
         {"  "}
-        <a href="https://github.com/izumiz-dev/negative-timer" target="_blank">
+        <a
+          href="https://github.com/izumiz-dev/negative-timer"
+          target="_blank"
+          rel="noreferrer"
+        >
           <Typography variant="caption">Github Repo</Typography>
         </a>
         {"  "}
-        <a href="https://twitter.com/izumiz_dev" target="_blank">
+        <a
+          href="https://twitter.com/izumiz_dev"
+          target="_blank"
+          rel="noreferrer"
+        >
           <Typography variant="caption">Contact</Typography>
         </a>
       </div>
