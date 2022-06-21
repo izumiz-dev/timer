@@ -1,62 +1,36 @@
 import "./App.css";
 import { Timer } from "./Timer";
 import Sound from "./sound.mp3";
-import AddIcon from "@mui/icons-material/Add";
-import PauseIcon from "@mui/icons-material/Pause";
-import PictureInPictureAltIcon from "@mui/icons-material/PictureInPictureAlt";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import RemoveIcon from "@mui/icons-material/Remove";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { Button, ButtonGroup } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { detect } from "detect-browser";
 import html2canvas from "html2canvas";
 import { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
 import useSound from "use-sound";
 import * as workerTimers from "worker-timers";
+import { TimerController } from "./TimerController";
+import { Clock } from "./Clock";
 
 const browser = detect();
 const isAvailablePiP =
   (browser?.name === "chrome" || browser?.name === "edge-chromium") &&
   (browser?.os === "Mac OS" || browser?.os?.includes("Windows"));
 
-const OuterTimer = styled.div`
-  height: 100vh;
-  font-size: calc(25vw + 16px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Controllers = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  align-content: stretch;
-  flex-direction: column;
-  div {
-    margin: 2px;
-  }
-`;
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#cecece",
-    },
-    secondary: {
-      main: "#69a7ba",
-    },
-  },
-});
-
 function App() {
   const $dom = useRef<any>(null);
+  const $domClock = useRef<any>(null);
   const $video = useRef<any>(null);
+  const $videoClock = useRef<any>(null);
   const [start, setStart] = useState<boolean>(false);
   const [tick, setTick] = useState<number>(0);
   const [play, { stop }] = useSound(Sound);
+  const [clock, setClock] = useState<boolean>(false);
+  const [time, setTime] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTime(new Date());
+    }, 100);
+    return () => clearInterval(id);
+  });
 
   useEffect(() => {
     if (start) {
@@ -83,99 +57,42 @@ function App() {
       });
   }, [tick]);
 
+  useEffect(() => {
+    html2canvas($domClock.current)
+      .then((canvas) => {
+        const stream = canvas.captureStream();
+        $videoClock.current.srcObject = stream as any;
+        $videoClock.current.play();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [time]);
+
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <Controllers>
-          <ButtonGroup>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => setTick(tick - 10 * 60)}
-              startIcon={<RemoveIcon />}
-            >
-              10
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => setTick(tick - 5 * 60)}
-              startIcon={<RemoveIcon />}
-            >
-              5
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => {
-                setTick(0);
-                setStart(false);
-                stop();
-              }}
-              startIcon={<RestartAltIcon />}
-            >
-              Reset
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => setTick(tick + 5 * 60)}
-              startIcon={<AddIcon />}
-            >
-              5
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => setTick(tick + 10 * 60)}
-              startIcon={<AddIcon />}
-            >
-              10
-            </Button>
-          </ButtonGroup>
-          <ButtonGroup>
-            <Button
-              variant="contained"
-              onClick={() => setStart(true)}
-              startIcon={<PlayArrowIcon />}
-            >
-              Start
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => {
-                setStart(false);
-                stop();
-              }}
-              startIcon={<PauseIcon />}
-            >
-              Pause
-            </Button>
-            {isAvailablePiP && (
-              <Button
-                variant="contained"
-                onClick={async () => {
-                  try {
-                    if ($video.current !== document.pictureInPictureElement) {
-                      await $video.current.requestPictureInPicture();
-                    } else {
-                      await document.exitPictureInPicture();
-                    }
-                  } catch (error) {
-                    console.log("ERROR", error);
-                  }
-                }}
-                startIcon={<PictureInPictureAltIcon />}
-              >
-                PiP
-              </Button>
-            )}
-          </ButtonGroup>
-        </Controllers>
-        <OuterTimer>
-          <Timer tick={tick} dom={$dom} />
-        </OuterTimer>
-        {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
-      </ThemeProvider>
+      <TimerController
+        setStart={setStart}
+        tick={tick}
+        setTick={setTick}
+        stop={stop}
+        isAvailablePiP={isAvailablePiP}
+        video={$video}
+        videoClock={$videoClock}
+        clock={clock}
+        setClock={setClock}
+      />
+      {clock ? (
+        <div>
+          <Clock time={time} dom={$domClock} />
+        </div>
+      ) : (
+        <Timer tick={tick} dom={$dom} />
+      )}
+      {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
+      {isAvailablePiP && (
+        <video style={{ display: "none" }} ref={$videoClock} />
+      )}
     </>
   );
 }
