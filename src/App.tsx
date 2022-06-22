@@ -25,13 +25,16 @@ function App() {
   const [play, { stop }] = useSound(Sound);
   const [clock, setClock] = useState<boolean>(false);
   const [time, setTime] = useState<Date>(new Date());
+  const [pomodoro, setPomodoro] = useState<boolean>(false);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setTime(new Date());
-    }, 100);
-    return () => clearInterval(id);
-  });
+    if (clock) {
+      const id = workerTimers.setInterval(() => {
+        setTime(new Date());
+      }, 1000);
+      return () => workerTimers.clearInterval(id);
+    }
+  }, [clock]);
 
   useEffect(() => {
     if (start) {
@@ -84,6 +87,8 @@ function App() {
           videoClock={$videoClock}
           clock={clock}
           setClock={setClock}
+          pomodoro={pomodoro}
+          setPomodoro={setPomodoro}
         />
       )}
 
@@ -92,7 +97,7 @@ function App() {
           <Clock time={time} dom={$domClock} />
         </div>
       ) : (
-        <Timer tick={tick} dom={$dom} />
+        <Timer pomodoro={pomodoro} tick={tick} dom={$dom} />
       )}
       {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
       {isAvailablePiP && (

@@ -40,6 +40,8 @@ export const TimerController = ({
   videoClock,
   clock,
   setClock,
+  pomodoro,
+  setPomodoro,
 }: {
   start: boolean;
   setStart: any;
@@ -51,6 +53,8 @@ export const TimerController = ({
   video: any;
   clock: boolean;
   setClock: any;
+  pomodoro: boolean;
+  setPomodoro: any;
 }): JSX.Element => {
   return (
     <Controllers>
@@ -95,6 +99,21 @@ export const TimerController = ({
               startIcon={<AddIcon />}
             >
               10分
+            </Button>
+            <Button
+              color="error"
+              variant={pomodoro ? "contained" : "outlined"}
+              onClick={() => {
+                setTick(25 * 60);
+                setPomodoro(!pomodoro);
+                if (pomodoro) {
+                  setTick(0);
+                  setStart(false);
+                  stop();
+                }
+              }}
+            >
+              🍅 25分
             </Button>
           </ButtonGroup>
         </div>

@@ -4,14 +4,16 @@ import styled from "styled-components";
 export const Timer = ({
   tick,
   dom,
+  pomodoro,
 }: {
   tick: number;
   dom?: React.MutableRefObject<any>;
+  pomodoro: boolean;
 }) => {
   return (
     <>
       <OuterTimer isFullScreen={screenfull.isFullscreen}>
-        <StyledTimer tick={tick} ref={dom}>
+        <StyledTimer pomodoro={pomodoro} tick={tick} ref={dom}>
           {Math.floor(Math.abs(tick) / 60)
             .toString()
             .padStart(2, "0")}
@@ -22,9 +24,11 @@ export const Timer = ({
   );
 };
 
-const StyledTimer = styled.div`
-  color: ${(props: { tick: number }) =>
-    props.tick < 0 ? "#bd2c00" : "#36970d"};
+const StyledTimer = styled.div<{ tick: number; pomodoro: boolean }>`
+  color: ${({ tick, pomodoro }) =>
+    pomodoro ? "#FFFFFF" : tick < 0 ? "#bd2c00" : "#36970d"};
+  background-color: ${({ pomodoro }) => (pomodoro ? "#ed867f" : "inherit")};
+  border-radius: ${({ pomodoro }) => (pomodoro ? "100px" : "inherit")};
   font-weight: bold;
 `;
 
