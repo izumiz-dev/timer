@@ -1,4 +1,3 @@
-import "./App.css";
 import { Timer } from "./Timer";
 import Sound from "./sound.mp3";
 import { detect } from "detect-browser";

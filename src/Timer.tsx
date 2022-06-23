@@ -30,6 +30,8 @@ const StyledTimer = styled.div<{ tick: number; pomodoro: boolean }>`
   background-color: ${({ pomodoro }) => (pomodoro ? "#ed867f" : "inherit")};
   border-radius: ${({ pomodoro }) => (pomodoro ? "100px" : "inherit")};
   font-weight: bold;
+  font-family: Consolas, Monaco, monospace, "ＭＳ ゴシック", "MS Gothic",
+    Osaka−等幅;
 `;
 
 const OuterTimer = styled.div`

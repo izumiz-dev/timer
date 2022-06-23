@@ -19,6 +19,8 @@ export const Clock = ({
 
 const StyledClock = styled.div`
   font-weight: bold;
+  font-family: Consolas, Monaco, monospace, "ＭＳ ゴシック", "MS Gothic",
+    Osaka−等幅;
 `;
 
 const OuterClock = styled.div`
