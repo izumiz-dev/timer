@@ -5,15 +5,22 @@ export const Timer = ({
   tick,
   dom,
   pomodoro,
+  isPresentation,
 }: {
   tick: number;
   dom?: React.MutableRefObject<any>;
   pomodoro: boolean;
+  isPresentation: boolean;
 }) => {
   return (
     <>
       <OuterTimer isFullScreen={screenfull.isFullscreen}>
-        <StyledTimer pomodoro={pomodoro} tick={tick} ref={dom}>
+        <StyledTimer
+          pomodoro={pomodoro}
+          tick={tick}
+          ref={dom}
+          isPresentation={isPresentation}
+        >
           {Math.floor(Math.abs(tick) / 60)
             .toString()
             .padStart(2, "0")}
@@ -24,9 +31,19 @@ export const Timer = ({
   );
 };
 
-const StyledTimer = styled.div<{ tick: number; pomodoro: boolean }>`
-  color: ${({ tick, pomodoro }) =>
-    pomodoro ? "#FFFFFF" : tick < 0 ? "#bd2c00" : "#36970d"};
+const StyledTimer = styled.div<{
+  tick: number;
+  pomodoro: boolean;
+  isPresentation: boolean;
+}>`
+  color: ${({ tick, pomodoro, isPresentation }) =>
+    isPresentation
+      ? "#000000"
+      : pomodoro
+      ? "#FFFFFF"
+      : tick < 0
+      ? "#bd2c00"
+      : "#36970d"};
   background-color: ${({ pomodoro }) => (pomodoro ? "#ed867f" : "inherit")};
   border-radius: ${({ pomodoro }) => (pomodoro ? "100px" : "inherit")};
   font-weight: bold;

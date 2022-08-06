@@ -12,9 +12,11 @@ import {
   Switch,
   Tooltip,
   Typography,
+  TextField,
 } from "@mui/material";
 import styled from "styled-components";
 import screenfull from "screenfull";
+import Box from "@mui/system/Box";
 
 const Controllers = styled.div`
   display: flex;
@@ -42,6 +44,10 @@ export const TimerController = ({
   setClock,
   pomodoro,
   setPomodoro,
+  presentation,
+  setPresentation,
+  bells,
+  setBells,
 }: {
   start: boolean;
   setStart: any;
@@ -55,67 +61,138 @@ export const TimerController = ({
   setClock: any;
   pomodoro: boolean;
   setPomodoro: any;
+  presentation: boolean;
+  setPresentation: any;
+  bells: string[];
+  setBells: any;
 }): JSX.Element => {
   return (
     <Controllers>
       <div>
-        <div style={{ marginBottom: "8px" }}>
-          <Typography style={{ margin: "0 2px" }}>時間設定</Typography>
-          <ButtonGroup disabled={clock}>
-            <Button
-              color="error"
-              onClick={() => setTick(tick - 10 * 60)}
-              startIcon={<RemoveIcon />}
-            >
-              10分
-            </Button>
-            <Button
-              color="error"
-              onClick={() => setTick(tick - 5 * 60)}
-              startIcon={<RemoveIcon />}
-            >
-              5分
-            </Button>
-            <Button
-              onClick={() => {
-                setTick(0);
-                setStart(false);
-                stop();
+        <div style={{ minHeight: "80px" }}>
+          {!presentation && (
+            <div style={{ marginBottom: "8px" }}>
+              <Typography style={{ margin: "0 2px" }}>
+                タイマー時間設定
+              </Typography>
+              <ButtonGroup disabled={clock} style={{ marginTop: "4px" }}>
+                <Button
+                  color="error"
+                  onClick={() => setTick(tick - 10 * 60)}
+                  startIcon={<RemoveIcon />}
+                >
+                  10分
+                </Button>
+                <Button
+                  color="error"
+                  onClick={() => setTick(tick - 5 * 60)}
+                  startIcon={<RemoveIcon />}
+                >
+                  5分
+                </Button>
+                <Button
+                  onClick={() => {
+                    setTick(0);
+                    setStart(false);
+                    stop();
+                  }}
+                  startIcon={<RestartAltIcon />}
+                >
+                  リセット
+                </Button>
+                <Button
+                  color="success"
+                  onClick={() => setTick(tick + 5 * 60)}
+                  startIcon={<AddIcon />}
+                >
+                  5分
+                </Button>
+                <Button
+                  color="success"
+                  onClick={() => setTick(tick + 10 * 60)}
+                  startIcon={<AddIcon />}
+                >
+                  10分
+                </Button>
+                <Button
+                  color="error"
+                  variant={pomodoro ? "contained" : "outlined"}
+                  onClick={() => {
+                    setTick(25 * 60);
+                    setPomodoro(!pomodoro);
+                    if (pomodoro) {
+                      setTick(0);
+                      setStart(false);
+                      stop();
+                    }
+                  }}
+                  disabled={presentation}
+                >
+                  🍅 25分
+                </Button>
+              </ButtonGroup>
+            </div>
+          )}
+          {presentation && (
+            <Box
+              component="form"
+              sx={{
+                "& .MuiTextField-root": { m: 1, width: "25ch" },
               }}
-              startIcon={<RestartAltIcon />}
+              noValidate
+              autoComplete="off"
             >
-              リセット
-            </Button>
-            <Button
-              color="success"
-              onClick={() => setTick(tick + 5 * 60)}
-              startIcon={<AddIcon />}
-            >
-              5分
-            </Button>
-            <Button
-              color="success"
-              onClick={() => setTick(tick + 10 * 60)}
-              startIcon={<AddIcon />}
-            >
-              10分
-            </Button>
-            <Button
-              color="error"
-              variant={pomodoro ? "contained" : "outlined"}
-              onClick={() => {
-                setTick(25 * 60);
-                setPomodoro(!pomodoro);
-                if (pomodoro) {
-                  setTick(0);
-                  setStart(false);
-                  stop();
-                }
-              }}
-            >
-              🍅 25分
-            </Button>
-          </ButtonGroup>
+              <Typography>ベル時間設定</Typography>
+              <div>
+                <TextField
+                  size="small"
+                  style={{ width: 80 }}
+                  label="1ベル"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  onChange={(event) => {
+                    bells[0] = event.target.value;
+                    const newBells = JSON.parse(JSON.stringify(bells));
+                    setBells(newBells);
+                  }}
+                  value={bells[0]}
+                  disabled={start}
+                />
+                <TextField
+                  size="small"
+                  style={{ width: 80 }}
+                  label="2ベル"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  onChange={(event) => {
+                    bells[1] = event.target.value;
+                    const newBells = JSON.parse(JSON.stringify(bells));
+                    setBells(newBells);
+                  }}
+                  value={bells[1]}
+                  disabled={start}
+                />
+                <TextField
+                  size="small"
+                  style={{ width: 80 }}
+                  label="3ベル"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  contentEditable={false}
+                  onChange={(event) => {
+                    bells[2] = event.target.value;
+                    const newBells = JSON.parse(JSON.stringify(bells));
+                    setBells(newBells);
+                  }}
+                  value={bells[2]}
+                  disabled={start}
+                />
+              </div>
+            </Box>
+          )}
         </div>
         <div
           style={{
@@ -203,54 +280,29 @@ export const TimerController = ({
             </ButtonGroup>
           </div>
           <div>
-            <Typography style={{ marginLeft: "4px" }}>その他</Typography>
+            <Typography style={{ marginLeft: "4px" }}>その他モード</Typography>
+            <Tooltip placement="top" title="プレゼンテーションモード">
+              <FormControlLabel
+                style={{ marginLeft: "4px" }}
+                label="タイムキーパー"
+                control={
+                  <Switch onClick={() => setPresentation(!presentation)} />
+                }
+                disabled={pomodoro}
+              />
+            </Tooltip>
             <Tooltip
               placement="top"
               title="タイマーの代わりに現在時刻が表示されます。"
             >
               <FormControlLabel
                 style={{ marginLeft: "4px" }}
-                label="時計モード"
+                label="時計"
                 control={<Switch onClick={() => setClock(!clock)} />}
-              />
-            </Tooltip>
-            <Tooltip placement="top" title="今後実装予定です。">
-              <FormControlLabel
-                style={{ marginLeft: "4px" }}
-                label="ダークテーマ"
-                control={
-                  <Switch onClick={() => window.alert("今後実装予定です。")} />
-                }
               />
             </Tooltip>
           </div>
         </div>
-      </div>
-
-      <div style={{ width: "100%", margin: "0 4px" }}>
-        <a
-          href="https://www.izumiz.me/blog/pip-countdown-timer"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <Typography variant="caption">Blog Post</Typography>
-        </a>
-        {"  "}
-        <a
-          href="https://github.com/izumiz-dev/negative-timer"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <Typography variant="caption">Github Repo</Typography>
-        </a>
-        {"  "}
-        <a
-          href="https://twitter.com/izumiz_dev"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <Typography variant="caption">Contact</Typography>
-        </a>
       </div>
     </Controllers>
   );
