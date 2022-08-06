@@ -17,6 +17,9 @@ import {
 import styled from "styled-components";
 import screenfull from "screenfull";
 import Box from "@mui/system/Box";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import useSound from "use-sound";
+import BellSound from "./bell.mp3";
 
 const Controllers = styled.div`
   display: flex;
@@ -66,6 +69,10 @@ export const TimerController = ({
   bells: string[];
   setBells: any;
 }): JSX.Element => {
+  const [ringBell] = useSound(BellSound, {
+    interrupt: true,
+  });
+
   return (
     <Controllers>
       <div>
@@ -89,16 +96,6 @@ export const TimerController = ({
                   startIcon={<RemoveIcon />}
                 >
                   5分
-                </Button>
-                <Button
-                  onClick={() => {
-                    setTick(0);
-                    setStart(false);
-                    stop();
-                  }}
-                  startIcon={<RestartAltIcon />}
-                >
-                  リセット
                 </Button>
                 <Button
                   color="success"
@@ -134,64 +131,81 @@ export const TimerController = ({
             </div>
           )}
           {presentation && (
-            <Box
-              component="form"
-              sx={{
-                "& .MuiTextField-root": { m: 1, width: "25ch" },
-              }}
-              noValidate
-              autoComplete="off"
-            >
-              <Typography>ベル時間設定</Typography>
-              <div>
-                <TextField
-                  size="small"
-                  style={{ width: 80 }}
-                  label="1ベル"
-                  InputLabelProps={{
-                    shrink: true,
+            <div style={{ display: "flex" }}>
+              <Box
+                component="form"
+                sx={{
+                  "& .MuiTextField-root": { m: 1, width: "25ch" },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <Typography>ベル時間設定</Typography>
+                <div>
+                  <TextField
+                    size="small"
+                    style={{ width: 80 }}
+                    label="1ベル"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange={(event) => {
+                      bells[0] = event.target.value;
+                      const newBells = JSON.parse(JSON.stringify(bells));
+                      setBells(newBells);
+                    }}
+                    value={bells[0]}
+                    disabled={start}
+                  />
+
+                  <TextField
+                    size="small"
+                    style={{ width: 80 }}
+                    label="2ベル"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange={(event) => {
+                      bells[1] = event.target.value;
+                      const newBells = JSON.parse(JSON.stringify(bells));
+                      setBells(newBells);
+                    }}
+                    value={bells[1]}
+                    disabled={start}
+                  />
+                  <TextField
+                    size="small"
+                    style={{ width: 80 }}
+                    label="3ベル"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    contentEditable={false}
+                    onChange={(event) => {
+                      bells[2] = event.target.value;
+                      const newBells = JSON.parse(JSON.stringify(bells));
+                      setBells(newBells);
+                    }}
+                    value={bells[2]}
+                    disabled={start}
+                  />
+                </div>
+              </Box>
+              <div style={{ marginLeft: "40px" }}>
+                <Typography>音量確認</Typography>
+                <Button
+                  style={{ marginLeft: "4px", marginTop: "6px" }}
+                  size="large"
+                  variant="outlined"
+                  startIcon={<NotificationsIcon />}
+                  onClick={() => {
+                    ringBell();
                   }}
-                  onChange={(event) => {
-                    bells[0] = event.target.value;
-                    const newBells = JSON.parse(JSON.stringify(bells));
-                    setBells(newBells);
-                  }}
-                  value={bells[0]}
-                  disabled={start}
-                />
-                <TextField
-                  size="small"
-                  style={{ width: 80 }}
-                  label="2ベル"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  onChange={(event) => {
-                    bells[1] = event.target.value;
-                    const newBells = JSON.parse(JSON.stringify(bells));
-                    setBells(newBells);
-                  }}
-                  value={bells[1]}
-                  disabled={start}
-                />
-                <TextField
-                  size="small"
-                  style={{ width: 80 }}
-                  label="3ベル"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  contentEditable={false}
-                  onChange={(event) => {
-                    bells[2] = event.target.value;
-                    const newBells = JSON.parse(JSON.stringify(bells));
-                    setBells(newBells);
-                  }}
-                  value={bells[2]}
-                  disabled={start}
-                />
+                >
+                  ベルを鳴らす
+                </Button>
               </div>
-            </Box>
+            </div>
           )}
         </div>
         <div
@@ -222,6 +236,16 @@ export const TimerController = ({
               >
                 停止
               </Button>
+              <Button
+                onClick={() => {
+                  setTick(0);
+                  setStart(false);
+                  stop();
+                }}
+                startIcon={<RestartAltIcon />}
+              >
+                リセット
+              </Button>
             </ButtonGroup>
           </div>
           <div>
@@ -229,7 +253,7 @@ export const TimerController = ({
             <ButtonGroup>
               <Tooltip
                 placement="top"
-                title="全画面で表示します。操作UIが非表示になります。"
+                title="タイマー部分のみ全画面で表示します"
               >
                 <Button
                   onClick={() => {
@@ -244,7 +268,7 @@ export const TimerController = ({
               </Tooltip>
               <Tooltip
                 placement="top"
-                title="コンパクトなウィンドウとして表示します。"
+                title="タイマー部分のみをピクチャインピクチャで表示します"
               >
                 <Button
                   disabled={!isAvailablePiP}
@@ -281,7 +305,10 @@ export const TimerController = ({
           </div>
           <div>
             <Typography style={{ marginLeft: "4px" }}>その他モード</Typography>
-            <Tooltip placement="top" title="プレゼンテーションモード">
+            <Tooltip
+              placement="top"
+              title="３回までベルを鳴らすことができるモード"
+            >
               <FormControlLabel
                 style={{ marginLeft: "4px" }}
                 label="タイムキーパー"
@@ -291,10 +318,7 @@ export const TimerController = ({
                 disabled={pomodoro}
               />
             </Tooltip>
-            <Tooltip
-              placement="top"
-              title="タイマーの代わりに現在時刻が表示されます。"
-            >
+            <Tooltip placement="top" title="現在時刻が表示されます。">
               <FormControlLabel
                 style={{ marginLeft: "4px" }}
                 label="時計"
