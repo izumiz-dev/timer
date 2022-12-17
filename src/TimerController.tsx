@@ -1,6 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
 import PauseIcon from "@mui/icons-material/Pause";
-import PictureInPictureAltIcon from "@mui/icons-material/PictureInPictureAlt";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RemoveIcon from "@mui/icons-material/Remove";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
