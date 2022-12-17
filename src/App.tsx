@@ -13,7 +13,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Alert, AlertTitle, Button, ButtonGroup } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import PictureInPictureAltIcon from "@mui/icons-material/PictureInPictureAlt";
 import { PiPButton } from "./components/PiPButton";
 
 const browser = detect();
