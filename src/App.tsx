@@ -3,15 +3,18 @@ import Sound from "./sound.mp3";
 import BellSound from "./bell.mp3";
 import { detect } from "detect-browser";
 import html2canvas from "html2canvas";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
 import * as workerTimers from "worker-timers";
 import { TimerController } from "./TimerController";
 import { Clock } from "./Clock";
 import screenfull from "screenfull";
-import IconButton from "@mui/material/IconButton";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import { Alert, AlertTitle } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Alert, AlertTitle, Button, ButtonGroup } from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import PictureInPictureAltIcon from "@mui/icons-material/PictureInPictureAlt";
+import { PiPButton } from "./components/PiPButton";
 
 const browser = detect();
 const isAvailablePiP =
@@ -34,7 +37,7 @@ function App() {
   const [time, setTime] = useState<Date>(new Date());
   const [pomodoro, setPomodoro] = useState<boolean>(false);
   const [bells, setBells] = useState<string[]>(["10:00", "15:00", "20:00"]);
-  const [isHidden, setIsHidden] = useState<boolean>(false);
+  const [isHiddenCtrl, setIsHiddenCtrl] = useState<boolean>(false);
 
   useEffect(() => {
     if (clock) {
@@ -52,7 +55,6 @@ function App() {
       }, 1000);
 
       if (tick === bellToTick(bells[0])) {
-        console.log("asdfasdf");
         ringBell();
       }
 
@@ -131,6 +133,46 @@ function App() {
       )}
       {!screenfull.isFullscreen && (
         <div>
+          <div style={{ display: "flex" }}>
+            <Button
+              variant={isHiddenCtrl ? "contained" : "outlined"}
+              endIcon={<VisibilityIcon />}
+              onClick={() => setIsHiddenCtrl(!isHiddenCtrl)}
+              style={{ margin: "8px 8px 0px 8px" }}
+            >
+              {isHiddenCtrl ? "操作パネル表示" : "操作パネル非表示"}
+            </Button>
+            {isHiddenCtrl && (
+              <div style={{ margin: "8px 8px 0px 8px" }}>
+                <ButtonGroup disabled={clock}>
+                  <Button
+                    disabled={start}
+                    onClick={() => setStart(true)}
+                    startIcon={<PlayArrowIcon />}
+                  >
+                    開始
+                  </Button>
+                  <Button
+                    disabled={!start}
+                    onClick={() => {
+                      setStart(false);
+                      stop();
+                    }}
+                    startIcon={<PauseIcon />}
+                  >
+                    停止
+                  </Button>
+                  <PiPButton
+                    isAvailablePiP={isAvailablePiP}
+                    clock={clock}
+                    video={$video}
+                    videoClock={$videoClock}
+                  />
+                </ButtonGroup>
+              </div>
+            )}
+          </div>
+
           <div
             style={{
               display: "flex",
@@ -139,7 +181,7 @@ function App() {
               alignItems: "flex-start",
             }}
           >
-            <div style={controllerAnimation(isHidden)}>
+            <div style={isHiddenCtrl ? { display: "none" } : {}}>
               <TimerController
                 start={start}
                 setStart={setStart}
@@ -158,39 +200,13 @@ function App() {
                 bells={bells}
                 setBells={setBells}
               />
-              <button
-                style={{
-                  width: "30px",
-                  height: "80px",
-                  borderRadius: "0 20px 20px 0",
-                  background: "#7d7d7d",
-                  border: "none",
-                  color: "#FFF",
-                }}
-                onClick={() => setIsHidden(!isHidden)}
-              ></button>
             </div>
-            <IconButton
-              color="primary"
-              size="large"
-              onClick={() => {
-                const w = window.open(
-                  "https://github.com/izumiz-dev/negative-timer",
-                  "_blank"
-                );
-                if (w) {
-                  w.focus();
-                }
-              }}
-            >
-              <GitHubIcon />
-            </IconButton>
           </div>
         </div>
       )}
       {clock ? (
         <div>
-          <Clock time={time} dom={$domClock} />
+          <Clock time={time} dom={$domClock} isHiddenCtrl={isHiddenCtrl} />
         </div>
       ) : (
         <Timer
@@ -198,6 +214,7 @@ function App() {
           tick={tick}
           dom={$dom}
           isPresentation={presentation}
+          isHiddenCtrl={isHiddenCtrl}
         />
       )}
       {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
@@ -214,24 +231,4 @@ const bellToTick = (bellStr: string) => {
   const minutes: number = Number(bellStr.slice(0, 2));
   const seconds: number = Number(bellStr.slice(-2));
   return -(minutes * 60 + seconds);
-};
-
-const controllerAnimation = (isHidden: boolean): CSSProperties => {
-  if (isHidden) {
-    return {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      marginLeft: "-790px",
-      transition: "all .3s ease",
-      opacity: 0.5,
-    };
-  } else {
-    return {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      transition: "all .3s ease",
-    };
-  }
 };

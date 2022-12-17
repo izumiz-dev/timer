@@ -20,6 +20,7 @@ import Box from "@mui/system/Box";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import useSound from "use-sound";
 import BellSound from "./bell.mp3";
+import { PiPButton } from "./components/PiPButton";
 
 const Controllers = styled.div`
   display: flex;
@@ -270,36 +271,12 @@ export const TimerController = ({
                 placement="top"
                 title="タイマー部分のみをピクチャインピクチャで表示します"
               >
-                <Button
-                  disabled={!isAvailablePiP}
-                  onClick={async () => {
-                    try {
-                      if (clock) {
-                        if (
-                          videoClock.current !==
-                          document.pictureInPictureElement
-                        ) {
-                          await videoClock.current.requestPictureInPicture();
-                        } else {
-                          await document.exitPictureInPicture();
-                        }
-                      } else {
-                        if (
-                          video.current !== document.pictureInPictureElement
-                        ) {
-                          await video.current.requestPictureInPicture();
-                        } else {
-                          await document.exitPictureInPicture();
-                        }
-                      }
-                    } catch (error) {
-                      console.log("ERROR", error);
-                    }
-                  }}
-                  startIcon={<PictureInPictureAltIcon />}
-                >
-                  PiP
-                </Button>
+                <PiPButton
+                  isAvailablePiP={isAvailablePiP}
+                  clock={clock}
+                  video={video}
+                  videoClock={videoClock}
+                />
               </Tooltip>
             </ButtonGroup>
           </div>

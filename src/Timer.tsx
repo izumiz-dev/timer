@@ -6,15 +6,20 @@ export const Timer = ({
   dom,
   pomodoro,
   isPresentation,
+  isHiddenCtrl,
 }: {
   tick: number;
   dom?: React.MutableRefObject<any>;
   pomodoro: boolean;
   isPresentation: boolean;
+  isHiddenCtrl: boolean;
 }) => {
   return (
     <>
-      <OuterTimer isFullScreen={screenfull.isFullscreen}>
+      <OuterTimer
+        isFullScreen={screenfull.isFullscreen}
+        isHiddenCtrl={isHiddenCtrl}
+      >
         <StyledTimer
           pomodoro={pomodoro}
           tick={tick}
@@ -52,8 +57,10 @@ const StyledTimer = styled.div<{
 `;
 
 const OuterTimer = styled.div`
-  ${(props: { isFullScreen: boolean }) =>
-    props.isFullScreen ? `height: 100vh` : `height: calc(100vh - 220px)`};
+  ${(props: { isFullScreen: boolean; isHiddenCtrl: boolean }) =>
+    props.isFullScreen || props.isHiddenCtrl
+      ? `height: 100vh`
+      : `height: calc(100vh - 220px)`};
   font-size: calc(25vw + 16px);
   display: flex;
   justify-content: center;
