@@ -10,10 +10,24 @@ import { TimerController } from "./TimerController";
 import { Clock } from "./Clock";
 import screenfull from "screenfull";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Alert, AlertTitle, Button, ButtonGroup } from "@mui/material";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import TwitterIcon from "@mui/icons-material/Twitter";
+
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  ButtonGroup,
+  IconButton,
+} from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import { PiPButton } from "./components/PiPButton";
+
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
 const browser = detect();
 const isAvailablePiP =
@@ -37,6 +51,7 @@ function App() {
   const [pomodoro, setPomodoro] = useState<boolean>(false);
   const [bells, setBells] = useState<string[]>(["10:00", "15:00", "20:00"]);
   const [isHiddenCtrl, setIsHiddenCtrl] = useState<boolean>(false);
+  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(false);
 
   useEffect(() => {
     if (clock) {
@@ -105,122 +120,185 @@ function App() {
       });
   }, [time]);
 
+  const theme = createTheme({
+    palette: {
+      mode: isDarkTheme ? "dark" : "light",
+    },
+  });
+
   return (
-    <>
-      {!isAvailablePiP && (
-        <Alert variant="outlined" severity="warning" style={{ margin: "2px" }}>
-          <AlertTitle>未サポートのブラウザを検出</AlertTitle>
-          申し訳ありませんが、最新版の
-          <a
-            href="https://www.google.com/intl/ja_jp/chrome/"
-            target={"_blank"}
-            rel="noreferrer"
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <>
+        {!isAvailablePiP && (
+          <Alert
+            variant="outlined"
+            severity="warning"
+            style={{ margin: "2px" }}
           >
-            Google Chrome
-          </a>
-          もしくは
-          <a
-            href="https://www.microsoft.com/ja-jp/edge"
-            target={"_blank"}
-            rel="noreferrer"
-          >
-            Microsoft Edge
-          </a>
-          をご利用ください。
-          正常に機能しない場合や、予期しない誤動作が起こることがあります。
-        </Alert>
-      )}
-      {!screenfull.isFullscreen && (
-        <div>
-          <div style={{ display: "flex" }}>
-            <Button
-              variant={isHiddenCtrl ? "contained" : "outlined"}
-              endIcon={<VisibilityIcon />}
-              onClick={() => setIsHiddenCtrl(!isHiddenCtrl)}
-              style={{ margin: "8px 8px 0px 8px" }}
+            <AlertTitle>未サポートのブラウザを検出</AlertTitle>
+            申し訳ありませんが、最新版の
+            <a
+              href="https://www.google.com/intl/ja_jp/chrome/"
+              target={"_blank"}
+              rel="noreferrer"
             >
-              {isHiddenCtrl ? "操作パネル表示" : "操作パネル非表示"}
-            </Button>
-            {isHiddenCtrl && (
-              <div style={{ margin: "8px 8px 0px 8px" }}>
-                <ButtonGroup disabled={clock}>
-                  <Button
-                    disabled={start}
-                    onClick={() => setStart(true)}
-                    startIcon={<PlayArrowIcon />}
+              Google Chrome
+            </a>
+            もしくは
+            <a
+              href="https://www.microsoft.com/ja-jp/edge"
+              target={"_blank"}
+              rel="noreferrer"
+            >
+              Microsoft Edge
+            </a>
+            をご利用ください。
+            正常に機能しない場合や、予期しない誤動作が起こることがあります。
+          </Alert>
+        )}
+        {!screenfull.isFullscreen && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Button
+                variant={isHiddenCtrl ? "contained" : "outlined"}
+                endIcon={<VisibilityIcon />}
+                onClick={() => setIsHiddenCtrl(!isHiddenCtrl)}
+                style={{ margin: "8px 8px 0px 8px" }}
+                size="medium"
+              >
+                {isHiddenCtrl ? "操作パネル表示" : "操作パネル非表示"}
+              </Button>
+              {isHiddenCtrl && (
+                <div style={{ margin: "8px 8px 0px 8px" }}>
+                  <ButtonGroup disabled={clock}>
+                    <Button
+                      disabled={start}
+                      onClick={() => setStart(true)}
+                      startIcon={<PlayArrowIcon />}
+                      size="medium"
+                    >
+                      開始
+                    </Button>
+                    <Button
+                      disabled={!start}
+                      onClick={() => {
+                        setStart(false);
+                        stop();
+                      }}
+                      startIcon={<PauseIcon />}
+                      size="medium"
+                    >
+                      停止
+                    </Button>
+                    <PiPButton
+                      isAvailablePiP={isAvailablePiP}
+                      clock={clock}
+                      video={$video}
+                      videoClock={$videoClock}
+                    />
+                  </ButtonGroup>
+                </div>
+              )}
+              <div>
+                {localStorage.getItem("experimental") === "true" && (
+                  <IconButton
+                    style={{ margin: "4px 8px 0px 8px" }}
+                    color="primary"
+                    size="medium"
+                    onClick={() => setIsDarkTheme(!isDarkTheme)}
                   >
-                    開始
-                  </Button>
-                  <Button
-                    disabled={!start}
-                    onClick={() => {
-                      setStart(false);
-                      stop();
-                    }}
-                    startIcon={<PauseIcon />}
-                  >
-                    停止
-                  </Button>
-                  <PiPButton
-                    isAvailablePiP={isAvailablePiP}
-                    clock={clock}
-                    video={$video}
-                    videoClock={$videoClock}
-                  />
-                </ButtonGroup>
+                    {/* {isDarkTheme ? <DarkModeIcon/> : </LightModeIcon>} */}
+                    {!isDarkTheme && <DarkModeIcon />}
+                    {isDarkTheme && <LightModeIcon />}
+                  </IconButton>
+                )}
+                <IconButton
+                  style={{ margin: "4px 8px 0px 8px" }}
+                  color="primary"
+                  size="medium"
+                  onClick={() => {
+                    const w = window.open(
+                      "https://github.com/izumiz-dev/timer",
+                      "_blank"
+                    );
+                    if (w) {
+                      w.focus();
+                    }
+                  }}
+                >
+                  <GitHubIcon />
+                </IconButton>
+                <IconButton
+                  style={{ margin: "4px 8px 0px 8px" }}
+                  color="primary"
+                  size="medium"
+                  onClick={() => {
+                    const w = window.open(
+                      `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                        "便利なウェブタイマー timer.izumiz.me を利用しよう！"
+                      )}`,
+                      "_blank"
+                    );
+                    if (w) {
+                      w.focus();
+                    }
+                  }}
+                >
+                  <TwitterIcon />
+                </IconButton>
+              </div>
+            </div>
+            {!isHiddenCtrl && (
+              <div
+                style={{
+                  display: "flex",
+                  width: "100vw",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}
+              >
+                <TimerController
+                  start={start}
+                  setStart={setStart}
+                  tick={tick}
+                  setTick={setTick}
+                  stop={stop}
+                  isAvailablePiP={isAvailablePiP}
+                  video={$video}
+                  videoClock={$videoClock}
+                  clock={clock}
+                  setClock={setClock}
+                  pomodoro={pomodoro}
+                  setPomodoro={setPomodoro}
+                  presentation={presentation}
+                  setPresentation={setPresentation}
+                  bells={bells}
+                  setBells={setBells}
+                />
               </div>
             )}
           </div>
-
-          <div
-            style={{
-              display: "flex",
-              width: "100vw",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-            }}
-          >
-            <div style={isHiddenCtrl ? { display: "none" } : {}}>
-              <TimerController
-                start={start}
-                setStart={setStart}
-                tick={tick}
-                setTick={setTick}
-                stop={stop}
-                isAvailablePiP={isAvailablePiP}
-                video={$video}
-                videoClock={$videoClock}
-                clock={clock}
-                setClock={setClock}
-                pomodoro={pomodoro}
-                setPomodoro={setPomodoro}
-                presentation={presentation}
-                setPresentation={setPresentation}
-                bells={bells}
-                setBells={setBells}
-              />
-            </div>
+        )}
+        {clock ? (
+          <div>
+            <Clock time={time} dom={$domClock} isHiddenCtrl={isHiddenCtrl} />
           </div>
-        </div>
-      )}
-      {clock ? (
-        <div>
-          <Clock time={time} dom={$domClock} isHiddenCtrl={isHiddenCtrl} />
-        </div>
-      ) : (
-        <Timer
-          pomodoro={pomodoro}
-          tick={tick}
-          dom={$dom}
-          isPresentation={presentation}
-          isHiddenCtrl={isHiddenCtrl}
-        />
-      )}
-      {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
-      {isAvailablePiP && (
-        <video style={{ display: "none" }} ref={$videoClock} />
-      )}
-    </>
+        ) : (
+          <Timer
+            pomodoro={pomodoro}
+            tick={tick}
+            dom={$dom}
+            isPresentation={presentation}
+            isHiddenCtrl={isHiddenCtrl}
+          />
+        )}
+        {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
+        {isAvailablePiP && (
+          <video style={{ display: "none" }} ref={$videoClock} />
+        )}
+      </>
+    </ThemeProvider>
   );
 }
 

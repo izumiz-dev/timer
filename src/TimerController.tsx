@@ -289,7 +289,10 @@ export const TimerController = ({
                 style={{ marginLeft: "4px" }}
                 label="タイムキーパー"
                 control={
-                  <Switch onClick={() => setPresentation(!presentation)} />
+                  <Switch
+                    onClick={() => setPresentation(!presentation)}
+                    checked={presentation}
+                  />
                 }
                 disabled={pomodoro}
               />
@@ -298,7 +301,9 @@ export const TimerController = ({
               <FormControlLabel
                 style={{ marginLeft: "4px" }}
                 label="時計"
-                control={<Switch onClick={() => setClock(!clock)} />}
+                control={
+                  <Switch onClick={() => setClock(!clock)} checked={clock} />
+                }
               />
             </Tooltip>
           </div>
