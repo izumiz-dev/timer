@@ -2,7 +2,6 @@
 
 ## [timer.izumiz.me](https://timer.izumiz.me/)
 
-![image](https://user-images.githubusercontent.com/42127166/205447446-6d791aa0-9702-4dd2-b866-90f9e2650750.png)
 
 ## 主要な機能・特徴
 
