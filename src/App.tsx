@@ -130,7 +130,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <>
-        {!isAvailablePiP && (
+        {/* {!isAvailablePiP && (
           <Alert
             variant="outlined"
             severity="warning"
@@ -156,7 +156,7 @@ function App() {
             をご利用ください。
             正常に機能しない場合や、予期しない誤動作が起こることがあります。
           </Alert>
-        )}
+        )} */}
         {!screenfull.isFullscreen && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
