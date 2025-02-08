@@ -319,7 +319,7 @@ function App() {
             dom={$dom}
             isPresentation={presentation}
             isHiddenCtrl={isHiddenCtrl}
-            isDarkTheme={isDarkTheme} // 追加
+            isDarkTheme={isDarkTheme}
           />
         )}
         {isAvailablePiP && (

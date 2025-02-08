@@ -56,21 +56,17 @@ const StyledTimer = styled.div<{
         ? isDarkTheme ? "#FF6B6B" : "#E53935"
         : isDarkTheme ? "#66BB6A" : "#43A047";
   }};
+  display: inline-block;
   background-color: ${({ pomodoro, isDarkTheme }) => (
     pomodoro 
-      ? isDarkTheme ? "#D32F2F" : "#EF5350"
+      ? isDarkTheme ? "#C62828" : "#EF5350"
       : "inherit"
   )};
-  border-radius: ${({ pomodoro }) => (pomodoro ? "16px" : "inherit")};
+  border-radius: ${({ pomodoro }) => (
+    pomodoro ? "12px" : "inherit"
+  )};
   font-weight: 600;
   font-family: "SF Mono", Consolas, Monaco, monospace;
-  padding: ${({ pomodoro }) => (pomodoro ? "0.5em 1em" : "0")};
-  box-shadow: ${({ pomodoro }) => (
-    pomodoro 
-      ? "0 4px 6px rgba(0, 0, 0, 0.1)" 
-      : "none"
-  )};
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 const OuterTimer = styled.div<{ isFullScreen: boolean; isHiddenCtrl: boolean }>`
