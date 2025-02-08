@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import styled from "styled-components";
 import screenfull from "screenfull";
-import Box from "@mui/system/Box";
+import Box from "@mui/material/Box";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import useSound from "use-sound";
 import BellSound from "./bell.mp3";
@@ -146,6 +146,7 @@ export const TimerController = ({
                     size="small"
                     style={{ width: 80 }}
                     label="1ベル"
+                    placeholder="MM:SS"
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -161,6 +162,7 @@ export const TimerController = ({
                     size="small"
                     style={{ width: 80 }}
                     label="2ベル"
+                    placeholder="MM:SS"
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -176,10 +178,10 @@ export const TimerController = ({
                     size="small"
                     style={{ width: 80 }}
                     label="3ベル"
+                    placeholder="MM:SS"
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    contentEditable={false}
                     onChange={(event) => {
                       bells[2] = event.target.value;
                       const newBells = JSON.parse(JSON.stringify(bells));
@@ -270,7 +272,7 @@ export const TimerController = ({
                 title="タイマー部分のみをピクチャインピクチャで表示します"
               >
                 <PiPButton
-                  isAvailablePiP={isAvailablePiP}
+                  isAvailablePiP={isAvailablePiP ?? false}
                   clock={clock}
                   video={video}
                   videoClock={videoClock}

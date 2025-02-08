@@ -13,7 +13,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import TwitterIcon from "@mui/icons-material/Twitter";
 
 import { Button, ButtonGroup, IconButton } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -24,9 +23,10 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 const browser = detect();
-const isAvailablePiP =
-  (browser?.name === "chrome" || browser?.name === "edge-chromium") &&
-  (browser?.os === "Mac OS" || browser?.os?.includes("Windows"));
+const isAvailablePiP: boolean =
+  ((browser?.name === "chrome" || browser?.name === "edge-chromium") &&
+    (browser?.os === "Mac OS" || (browser?.os && browser.os.includes("Windows")))) ||
+  false;
 
 function App() {
   const $dom = useRef<any>(null);
@@ -47,72 +47,127 @@ function App() {
   const [isHiddenCtrl, setIsHiddenCtrl] = useState<boolean>(false);
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(false);
 
+  const startTimeRef = useRef<number | null>(null);
+  const initialTickRef = useRef<number>(0);
+
   useEffect(() => {
     if (clock) {
-      const id = workerTimers.setInterval(() => {
+      setTime(new Date());
+
+      const now = new Date().getTime();
+      const delay = 1000 - (now % 1000);
+
+      const timeoutId = workerTimers.setTimeout(() => {
         setTime(new Date());
-      }, 1000);
-      return () => workerTimers.clearInterval(id);
+        const intervalId = workerTimers.setInterval(() => {
+          setTime(new Date());
+        }, 1000);
+        return () => workerTimers.clearInterval(intervalId);
+      }, delay);
+
+      return () => workerTimers.clearTimeout(timeoutId);
     }
   }, [clock]);
 
   useEffect(() => {
-    if (start) {
-      const id = workerTimers.setInterval(() => {
-        setTick((t) => t - 1);
-      }, 1000);
-
-      if (tick === bellToTick(bells[0])) {
-        ringBell();
-      }
-
-      if (tick === bellToTick(bells[1])) {
-        ringBell();
-        setTimeout(() => {
-          ringBell();
-        }, 200);
-      }
-
-      if (tick === bellToTick(bells[2])) {
-        ringBell();
-        setTimeout(() => {
-          ringBell();
-        }, 300);
-        setTimeout(() => {
-          ringBell();
-        }, 600);
-      }
-
-      if (tick === 0 && !presentation) {
-        play();
-      }
-      return () => workerTimers.clearInterval(id);
+    if (start && startTimeRef.current === null) {
+      startTimeRef.current = Date.now();
+      initialTickRef.current = tick;
     }
-  }, [tick, start, play, bells, presentation, ringBell]);
+    if (!start) {
+      startTimeRef.current = null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [start]);
 
   useEffect(() => {
-    html2canvas($dom.current)
+    if (start) {
+      const id = workerTimers.setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTimeRef.current!) / 1000);
+        const newTick = initialTickRef.current - elapsed;
+        setTick(newTick);
+
+        if (newTick === bellToTick(bells[0])) {
+          ringBell();
+        }
+        if (newTick === bellToTick(bells[1])) {
+          ringBell();
+          setTimeout(() => {
+            ringBell();
+          }, 200);
+        }
+        if (newTick === bellToTick(bells[2])) {
+          ringBell();
+          setTimeout(() => {
+            ringBell();
+          }, 300);
+          setTimeout(() => {
+            ringBell();
+          }, 600);
+        }
+        if (newTick === 0 && !presentation) {
+          play();
+        }
+      }, 1000);
+      return () => workerTimers.clearInterval(id);
+    }
+  }, [start, bells, presentation, ringBell, play]);
+
+  useEffect(() => {
+    if (!$dom.current) return;
+    html2canvas($dom.current, {
+      ignoreElements: (element) =>
+        element.tagName.toLowerCase() === "video",
+    })
       .then((canvas) => {
         const stream = canvas.captureStream();
-        $video.current.srcObject = stream as any;
-        $video.current.play();
+        if ($video.current) {
+          $video.current.srcObject = stream as any;
+            ($video.current as HTMLVideoElement).play().catch((err: DOMException) => {
+            if (err.name !== 'AbortError') {
+              console.error('Video playback error:', err);
+            }
+            });
+        }
       })
       .catch((err) => {
-        console.error(err);
+        console.error("Canvas capture error:", err);
       });
   }, [tick]);
 
   useEffect(() => {
+    if (!$domClock.current) return;
     html2canvas($domClock.current)
       .then((canvas) => {
         const stream = canvas.captureStream();
-        $videoClock.current.srcObject = stream as any;
-        $videoClock.current.play();
+        if ($videoClock.current) {
+          $videoClock.current.srcObject = stream as any;
+            ($videoClock.current as HTMLVideoElement).play().catch((err: any) => console.error("videoClock play error: ", err));
+        }
       })
       .catch((err) => {
         console.error(err);
       });
   }, [time]);
+
+  useEffect(() => {
+    const unlockAudio = () => {
+      const audioElements = document.getElementsByTagName("audio");
+      Array.from(audioElements).forEach((el) => {
+        const promise = el.play();
+        if (promise !== undefined) {
+          promise
+            .then(() => {
+              el.pause();
+              el.currentTime = 0;
+            })
+            .catch(() => {});
+        }
+      });
+      document.removeEventListener("click", unlockAudio);
+    };
+    document.addEventListener("click", unlockAudio);
+  }, []);
 
   const theme = createTheme({
     palette: {
@@ -124,33 +179,6 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <>
-        {/* {!isAvailablePiP && (
-          <Alert
-            variant="outlined"
-            severity="warning"
-            style={{ margin: "2px" }}
-          >
-            <AlertTitle>未サポートのブラウザを検出</AlertTitle>
-            申し訳ありませんが、最新版の
-            <a
-              href="https://www.google.com/intl/ja_jp/chrome/"
-              target={"_blank"}
-              rel="noreferrer"
-            >
-              Google Chrome
-            </a>
-            もしくは
-            <a
-              href="https://www.microsoft.com/ja-jp/edge"
-              target={"_blank"}
-              rel="noreferrer"
-            >
-              Microsoft Edge
-            </a>
-            をご利用ください。
-            正常に機能しない場合や、予期しない誤動作が起こることがあります。
-          </Alert>
-        )} */}
         {!screenfull.isFullscreen && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -168,7 +196,15 @@ function App() {
                   <ButtonGroup disabled={clock}>
                     <Button
                       disabled={start}
-                      onClick={() => setStart(true)}
+                      onClick={() => {
+                        setStart(true);
+                        if ($video.current) {
+                          $video.current.play();
+                        }
+                        if ($videoClock.current) {
+                          $videoClock.current.play();
+                        }
+                      }}
                       startIcon={<PlayArrowIcon />}
                       size="medium"
                     >
@@ -202,7 +238,6 @@ function App() {
                     size="medium"
                     onClick={() => setIsDarkTheme(!isDarkTheme)}
                   >
-                    {/* {isDarkTheme ? <DarkModeIcon/> : </LightModeIcon>} */}
                     {!isDarkTheme && <DarkModeIcon />}
                     {isDarkTheme && <LightModeIcon />}
                   </IconButton>
@@ -222,24 +257,6 @@ function App() {
                   }}
                 >
                   <GitHubIcon />
-                </IconButton>
-                <IconButton
-                  style={{ margin: "4px 8px 0px 8px" }}
-                  color="primary"
-                  size="medium"
-                  onClick={() => {
-                    const w = window.open(
-                      `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                        "便利なウェブタイマー timer.izumiz.me を利用しよう！"
-                      )}`,
-                      "_blank"
-                    );
-                    if (w) {
-                      w.focus();
-                    }
-                  }}
-                >
-                  <TwitterIcon />
                 </IconButton>
               </div>
             </div>
@@ -285,11 +302,11 @@ function App() {
             dom={$dom}
             isPresentation={presentation}
             isHiddenCtrl={isHiddenCtrl}
-          />
+          /> 
         )}
-        {isAvailablePiP && <video style={{ display: "none" }} ref={$video} />}
+        {isAvailablePiP && <video muted style={{ display: "none" }} ref={$video} />}
         {isAvailablePiP && (
-          <video style={{ display: "none" }} ref={$videoClock} />
+          <video muted style={{ display: "none" }} ref={$videoClock} />
         )}
       </>
     </ThemeProvider>
