@@ -14,7 +14,7 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 
-import { Button, ButtonGroup, IconButton } from "@mui/material";
+import { Button, ButtonGroup, GlobalStyles, IconButton } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import { PiPButton } from "./components/PiPButton";
@@ -25,7 +25,8 @@ import CssBaseline from "@mui/material/CssBaseline";
 const browser = detect();
 const isAvailablePiP: boolean =
   ((browser?.name === "chrome" || browser?.name === "edge-chromium") &&
-    (browser?.os === "Mac OS" || (browser?.os && browser.os.includes("Windows")))) ||
+    (browser?.os === "Mac OS" ||
+      (browser?.os && browser.os.includes("Windows")))) ||
   false;
 
 function App() {
@@ -45,7 +46,12 @@ function App() {
   const [pomodoro, setPomodoro] = useState<boolean>(false);
   const [bells, setBells] = useState<string[]>(["10:00", "15:00", "20:00"]);
   const [isHiddenCtrl, setIsHiddenCtrl] = useState<boolean>(false);
-  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(false);
+  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return true;
+  });
 
   const startTimeRef = useRef<number | null>(null);
   const initialTickRef = useRef<number>(0);
@@ -116,39 +122,45 @@ function App() {
   useEffect(() => {
     if (!$dom.current) return;
     html2canvas($dom.current, {
-      ignoreElements: (element) =>
-        element.tagName.toLowerCase() === "video",
+      ignoreElements: (element) => element.tagName.toLowerCase() === "video",
+      backgroundColor: isDarkTheme ? "#000" : "#fff",
     })
       .then((canvas) => {
         const stream = canvas.captureStream();
         if ($video.current) {
           $video.current.srcObject = stream as any;
-            ($video.current as HTMLVideoElement).play().catch((err: DOMException) => {
-            if (err.name !== 'AbortError') {
-              console.error('Video playback error:', err);
-            }
+          ($video.current as HTMLVideoElement)
+            .play()
+            .catch((err: DOMException) => {
+              if (err.name !== "AbortError") {
+                console.error("Video playback error:", err);
+              }
             });
         }
       })
       .catch((err) => {
         console.error("Canvas capture error:", err);
       });
-  }, [tick]);
+  }, [tick, isDarkTheme]);
 
   useEffect(() => {
     if (!$domClock.current) return;
-    html2canvas($domClock.current)
+    html2canvas($domClock.current, {
+      backgroundColor: isDarkTheme ? "#000" : "#fff",
+    })
       .then((canvas) => {
         const stream = canvas.captureStream();
         if ($videoClock.current) {
           $videoClock.current.srcObject = stream as any;
-            ($videoClock.current as HTMLVideoElement).play().catch((err: any) => console.error("videoClock play error: ", err));
+          ($videoClock.current as HTMLVideoElement)
+            .play()
+            .catch((err: any) => console.error("videoClock play error: ", err));
         }
       })
       .catch((err) => {
         console.error(err);
       });
-  }, [time]);
+  }, [time, isDarkTheme]);
 
   useEffect(() => {
     const unlockAudio = () => {
@@ -177,6 +189,13 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <GlobalStyles
+        styles={{
+          body: {
+            transition: "background-color 0.5s ease",
+          },
+        }}
+      />
       <CssBaseline />
       <>
         {!screenfull.isFullscreen && (
@@ -231,17 +250,15 @@ function App() {
                 </div>
               )}
               <div>
-                {localStorage.getItem("experimental") === "true" && (
-                  <IconButton
-                    style={{ margin: "4px 8px 0px 8px" }}
-                    color="primary"
-                    size="medium"
-                    onClick={() => setIsDarkTheme(!isDarkTheme)}
-                  >
-                    {!isDarkTheme && <DarkModeIcon />}
-                    {isDarkTheme && <LightModeIcon />}
-                  </IconButton>
-                )}
+                <IconButton
+                  style={{ margin: "4px 8px 0px 8px" }}
+                  color="primary"
+                  size="medium"
+                  onClick={() => setIsDarkTheme(!isDarkTheme)}
+                >
+                  {!isDarkTheme && <DarkModeIcon />}
+                  {isDarkTheme && <LightModeIcon />}
+                </IconButton>
                 <IconButton
                   style={{ margin: "4px 8px 0px 8px" }}
                   color="primary"
@@ -302,9 +319,12 @@ function App() {
             dom={$dom}
             isPresentation={presentation}
             isHiddenCtrl={isHiddenCtrl}
-          /> 
+            isDarkTheme={isDarkTheme} // 追加
+          />
         )}
-        {isAvailablePiP && <video muted style={{ display: "none" }} ref={$video} />}
+        {isAvailablePiP && (
+          <video muted style={{ display: "none" }} ref={$video} />
+        )}
         {isAvailablePiP && (
           <video muted style={{ display: "none" }} ref={$videoClock} />
         )}
